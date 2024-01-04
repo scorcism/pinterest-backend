@@ -6,10 +6,15 @@ const tagSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    title: {
-      type: String,
-      require: true,
+    imageId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Image",
     },
+    tags: [
+      {
+        type: String,
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -4,10 +4,13 @@ const ERROR_MESSAGE = {
   1001: "Internal Server Error",
   1002: "Account already exists with the username or email",
   1003: "Check all the fileds",
+  1004: "Invalid Credentials",
 };
 
 const SUCCESS_MESSAGE = {
   2001: "Account registration complete, please verify your account",
+  2002: "Account Verification complete, please login ",
+  2003: "Account already verified, please login ",
 };
 
 const ERROR_RESPONSE = (http_code, error_code, error = {}) => {
@@ -16,7 +19,7 @@ const ERROR_RESPONSE = (http_code, error_code, error = {}) => {
     message: ERROR_MESSAGE[error_code],
     error_code,
     data: {},
-    error: error ,
+    error: error,
   };
 };
 

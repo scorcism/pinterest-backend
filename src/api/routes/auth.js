@@ -1,5 +1,5 @@
 const express = require("express");
-const { register } = require("../controllers/auth.controller");
+const { register, verifyAccount } = require("../controllers/auth.controller");
 const {
   registerValidation,
 } = require("../../helpers/validations/auth.validation");
@@ -11,5 +11,6 @@ router.get("/health", (req, res) => {
 });
 
 router.post("/register", registerValidation, register);
+router.post("/verify-account/:id", verifyAccount);
 
 module.exports = router;
