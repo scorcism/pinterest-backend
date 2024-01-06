@@ -1,5 +1,11 @@
 const express = require("express");
-const { register, verifyAccount } = require("../controllers/auth.controller");
+const {
+  register,
+  verifyAccount,
+  login,
+  forgotPassword,
+  resetPassword,
+} = require("../controllers/auth.controller");
 const {
   registerValidation,
 } = require("../../helpers/validations/auth.validation");
@@ -12,5 +18,8 @@ router.get("/health", (req, res) => {
 
 router.post("/register", registerValidation, register);
 router.post("/verify-account/:id", verifyAccount);
+router.post("/login", login);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:id/:token", resetPassword);
 
 module.exports = router;

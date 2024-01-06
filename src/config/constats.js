@@ -5,12 +5,18 @@ const ERROR_MESSAGE = {
   1002: "Account already exists with the username or email",
   1003: "Check all the fileds",
   1004: "Invalid Credentials",
+  1005: "Please verify your account",
+  1006: "Password do not match",
+  1007: "Reset password token expired",
 };
 
 const SUCCESS_MESSAGE = {
   2001: "Account registration complete, please verify your account",
   2002: "Account Verification complete, please login ",
   2003: "Account already verified, please login ",
+  2004: "Login successfull ",
+  2005: "Reset Password mail has been sent",
+  2006: "Password reset successfull, please login",
 };
 
 const ERROR_RESPONSE = (http_code, error_code, error = {}) => {
