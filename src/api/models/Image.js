@@ -18,6 +18,11 @@ const imageSchema = mongoose.Schema(
       type: String,
       require: true,
     },
+    tags: [
+      {
+        type: String,
+      },
+    ],
   },
   { timestamps: true }
 );

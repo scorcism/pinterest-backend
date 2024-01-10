@@ -138,7 +138,6 @@ const login = async (req, res) => {
     }
 
     // Account exists, but not verified
-    console.log("user account: ", checkAccount);
     if (checkAccount.isVerified == 0) {
       return res
         .status(httpStatus.NOT_FOUND)

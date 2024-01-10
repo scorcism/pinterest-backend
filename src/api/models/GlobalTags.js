@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const globalTagSchema = mongoose.Schema(
+const globalTagsSchema = mongoose.Schema(
   {
     title: {
       type: String,
@@ -10,5 +10,5 @@ const globalTagSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-const GlobalTag = mongoose.model("GlobalTag", globalTagSchema);
-module.exports = GlobalTag;
+const GlobalTags = mongoose.model("GlobalTags", globalTagsSchema);
+module.exports = GlobalTags;
