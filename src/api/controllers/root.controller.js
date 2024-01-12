@@ -31,7 +31,7 @@ const uploadImage = async (title, file) => {
   return location;
 };
 
-const addImage = async (title, desc, tags, location) => {
+const addPost = async (title, desc, tags, location) => {
   const { userId } = req.user;
 
   try {
@@ -100,7 +100,7 @@ const getGlobalTags = async (req, res) => {
 };
 
 module.exports = {
-  addImage,
+  addPost,
   uploadImage,
   getGlobalTags,
   createGlobalTags,

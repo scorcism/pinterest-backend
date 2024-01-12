@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const {
   uploadImage,
-  addImage,
+  addPost,
   getGlobalTags,
   createGlobalTags,
 } = require("../controllers/root.controller");
@@ -17,17 +17,20 @@ const storage = multer.memoryStorage();
 
 const upload = multer({ storage: storage });
 
-router.post("/addImage", upload.single("image"), async (req, res) => {
+router.post("/addPost", upload.single("image"), async (req, res) => {
   const { title, desc } = req.body;
   // Upload image to s3, return the image url
   const location = await uploadImage(title, image);
 
   // Upload image to the DB
-  const response = await addImage(title, desc, tags, location);
+  const response = await addPost(title, desc, tags, location);
 
   return response;
 });
 
+// Add for delete post, edit post
+
 router.get("/getGlobalTags", getGlobalTags);
 router.post("/createGlobalTags", createGlobalTags);
+
 module.exports = router;
