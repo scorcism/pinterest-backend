@@ -52,7 +52,7 @@ const register = async (req, res) => {
     console.log("created account: ", createAccount);
     // Send mail
     if (createAccount) {
-      let link = `${process.env.FRONTEND_URL}/verify-acount/${createAccount._id}`;
+      let link = `${process.env.FRONTEND_URL}/verify-account/${createAccount._id}`;
       await verificationMail(email, link);
     }
 
@@ -270,8 +270,40 @@ const resetPassword = async (req, res) => {
   } catch (error) {
     console.log("reset password error: ", error);
     res
-      .status(httpStatus.BAD_REQUEST)
-      .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1007));
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+  }
+};
+
+const resendVerificationMail = async (req, res) => {
+  const { email } = req.body;
+  try {
+    let checkUser = await User.findOne({ email });
+
+    if (checkUser.isVerified == 1) {
+      return res
+        .status(httpStatus.OK)
+        .json(SUCCESS_RESPONSE(httpStatus.OK, 1009));
+    }
+
+    // Send mail
+    if (createAccount) {
+      let link = `${process.env.FRONTEND_URL}/verify-account/${createAccount._id}`;
+      await verificationMail(email, link);
+    }
+
+    res.status(httpStatus.CREATED).json(
+      SUCCESS_RESPONSE(httpStatus.CREATED, 2001, {
+        data: SUCCESS_MESSAGE[2001],
+      })
+    );
+
+    console.log("checkUser: ", checkUser);
+  } catch (error) {
+    console.log("reset password error: ", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
   }
 };
 
@@ -281,4 +313,5 @@ module.exports = {
   login,
   forgotPassword,
   resetPassword,
+  resendVerificationMail,
 };
