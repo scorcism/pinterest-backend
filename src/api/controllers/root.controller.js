@@ -1,7 +1,7 @@
 const S3 = require("aws-sdk/clients/s3");
 const httpStatus = require("http-status");
 const { ERROR_RESPONSE, SUCCESS_RESPONSE } = require("../../config/constats");
-const Image = require("../models/Image");
+const Post = require("../models/Post");
 const GlobalTags = require("../models/GlobalTags");
 
 const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
@@ -32,10 +32,10 @@ const uploadImage = async (title, file) => {
 };
 
 const addPost = async (title, desc, tags, location) => {
-  const { userId } = req.user;
+  const userId = req.user;
 
   try {
-    let newImage = await Image.create({
+    let newPost = await Post.create({
       userId,
       url: location,
       title,
@@ -43,11 +43,11 @@ const addPost = async (title, desc, tags, location) => {
       tags,
     });
 
-    console.log("new Image: ", newImage);
+    console.log("new Post: ", newPost);
 
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2007));
   } catch (error) {
-    console.log("Error while adding new image: ", error);
+    console.log("Error while adding new Post: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -99,8 +99,52 @@ const getGlobalTags = async (req, res) => {
   }
 };
 
+const deletePost = async (req, res) => {
+  const userId = req.user;
+  const postId = req.params.id;
+  try {
+    const deletePost = await Post.deleteOne({ userId: userId, _id: postId });
+    console.log("delete Post: ", deletePost);
+
+    return res
+      .status(httpStatus.OK)
+      .json(SUCCESS_RESPONSE(httpStatus.OK, 2011));
+  } catch (error) {
+    console.log("Error while deleting Post: ", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+  }
+};
+
+const updatePost = async (req, res) => {
+  const userId = req.user;
+
+  const postId = req.params.id;
+
+  const { title, desc } = req.body;
+
+  try {
+    const updatePost = await Post.updateOne(
+      { userId: userId, _id: postId },
+      { $set: { title, desc } }
+    );
+
+    console.log("update Post: ", updatePost);
+
+    res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2010));
+  } catch (error) {
+    console.log("Error while updating post: ", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+  }
+};
+
 module.exports = {
   addPost,
+  deletePost,
+  updatePost,
   uploadImage,
   getGlobalTags,
   createGlobalTags,

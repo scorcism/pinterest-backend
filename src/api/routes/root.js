@@ -5,6 +5,8 @@ const {
   addPost,
   getGlobalTags,
   createGlobalTags,
+  deletePost,
+  updatePost,
 } = require("../controllers/root.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 
@@ -23,20 +25,21 @@ router.post(
   authMiddleware,
   upload.single("image"),
   async (req, res) => {
-    const userId = req.user;
+    const { title, desc, image, tags } = req.body;
 
-    const { title, desc, tags } = req.body;
     // Upload image to s3, return the image url
+
     const location = await uploadImage(title, image);
 
     // Upload image to the DB
-    const response = await addPost(userId, title, desc, tags, location);
+    const response = await addPost(title, desc, tags, location);
 
-    // return response;
+    return response;
   }
 );
 
-// Add for delete post, edit post
+router.post("/updatePost/:id", authMiddleware, updatePost);
+router.post("/deletePost/:id", authMiddleware, deletePost);
 
 router.get("/getGlobalTags", getGlobalTags);
 router.post("/createGlobalTags", createGlobalTags);

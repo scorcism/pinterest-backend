@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const imageSchema = mongoose.Schema(
+const postSchema = mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -27,5 +27,5 @@ const imageSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-const Image = mongoose.model("Image", imageSchema);
-module.exports = Image;
+const Post = mongoose.model("Post", postSchema);
+module.exports = Post;

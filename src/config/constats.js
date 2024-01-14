@@ -18,9 +18,11 @@ const SUCCESS_MESSAGE = {
   2004: "Login successfull ",
   2005: "Reset Password mail has been sent",
   2006: "Password reset successfull, please login",
-  2007: "New Image added",
+  2007: "New Post created",
   2008: "List of Global Tags",
   2009: "Added new Global tag",
+  2010: "Post Updated",
+  2011: "Post Deleted",
 };
 
 const ERROR_RESPONSE = (http_code, error_code, error = {}) => {

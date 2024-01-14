@@ -27,6 +27,7 @@
     "nodemailer": "^6.9.8"
   },
   "devDependencies": {
+    "eslint": "^8.56.0",
     "nodemon": "^3.0.2"
   }
 }
