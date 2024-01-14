@@ -8,6 +8,7 @@ const ERROR_MESSAGE = {
   1005: "Please verify your account",
   1006: "Password do not match",
   1007: "Reset password token expired",
+  1008: "Token expired, please login",
 };
 
 const SUCCESS_MESSAGE = {

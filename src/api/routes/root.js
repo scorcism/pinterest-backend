@@ -6,6 +6,7 @@ const {
   getGlobalTags,
   createGlobalTags,
 } = require("../controllers/root.controller");
+const authMiddleware = require("../middleware/auth.middleware");
 
 const router = express.Router();
 
@@ -17,16 +18,23 @@ const storage = multer.memoryStorage();
 
 const upload = multer({ storage: storage });
 
-router.post("/addPost", upload.single("image"), async (req, res) => {
-  const { title, desc } = req.body;
-  // Upload image to s3, return the image url
-  const location = await uploadImage(title, image);
+router.post(
+  "/addPost",
+  authMiddleware,
+  upload.single("image"),
+  async (req, res) => {
+    const userId = req.user;
 
-  // Upload image to the DB
-  const response = await addPost(title, desc, tags, location);
+    const { title, desc, tags } = req.body;
+    // Upload image to s3, return the image url
+    const location = await uploadImage(title, image);
 
-  return response;
-});
+    // Upload image to the DB
+    const response = await addPost(userId, title, desc, tags, location);
+
+    // return response;
+  }
+);
 
 // Add for delete post, edit post
 

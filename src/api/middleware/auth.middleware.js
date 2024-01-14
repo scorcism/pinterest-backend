@@ -1,18 +1,24 @@
-const JwtStrategy = require("passport-jwt").Strategy;
-const ExtractJwt = require("passport-jwt").ExtractJwt;
-const passport = require("passport");
+const httpStatus = require("http-status");
+const jwt = require("jsonwebtoken");
+const { ERROR_RESPONSE } = require("../../config/constats");
 
-const authMiddleware = (next) => {
-  var opts = {};
-  opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-  opts.secretOrKey = "secret";
+const authMiddleware = (req, res, next) => {
+  try {
+    const tokenHeader = req.headers.authorization;
 
-  passport.use(
-    new JwtStrategy(opts, function (jwt_payload, done) {
-      console.log("decoded payload: ", jwt_payload);
-      next();
-    })
-  );
+    const token = tokenHeader.split(" ")[1];
+    const data = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = data.id;
+
+    next();
+  } catch (error) {
+    console.log("Middleware error: ", error);
+    return res.status(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1008)
+    );
+  }
 };
 
 module.exports = authMiddleware;
