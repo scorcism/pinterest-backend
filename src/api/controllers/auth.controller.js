@@ -18,8 +18,8 @@ const register = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(
-      ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1002, {
+    return res.status(httpStatus.BAD_REQUEST).json(
+      ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1002, {
         error: errors,
       })
     );
@@ -79,8 +79,8 @@ const verifyAccount = async (req, res) => {
     // Account doesnt exists
     if (!checkUserAccount) {
       return res
-        .status(httpStatus.NOT_FOUND)
-        .json(ERROR_RESPONSE(httpStatus.NOT_FOUND, 1004));
+        .status(httpStatus.BAD_REQUEST)
+        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1004));
     }
 
     if (checkUserAccount.isVerified == 1) {
@@ -121,8 +121,8 @@ const login = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res
-      .status(httpStatus.NOT_FOUND)
-      .json(ERROR_RESPONSE(httpStatus.NOT_FOUND, 1003, { error: errors }));
+      .status(httpStatus.BAD_REQUEST)
+      .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1003, { error: errors }));
   }
 
   try {
@@ -133,15 +133,15 @@ const login = async (req, res) => {
 
     if (!checkAccount) {
       return res
-        .status(httpStatus.NOT_FOUND)
-        .json(ERROR_RESPONSE(httpStatus.NOT_FOUND, 1004));
+        .status(httpStatus.BAD_REQUEST)
+        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1004));
     }
 
     // Account exists, but not verified
     if (checkAccount.isVerified == 0) {
       return res
-        .status(httpStatus.NOT_FOUND)
-        .json(ERROR_RESPONSE(httpStatus.NOT_FOUND, 1005));
+        .status(httpStatus.BAD_REQUEST)
+        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1005));
     }
 
     // Password do no
@@ -149,8 +149,8 @@ const login = async (req, res) => {
 
     if (!passwordCompare) {
       return res
-        .status(httpStatus.NOT_FOUND)
-        .json(ERROR_RESPONSE(httpStatus.NOT_FOUND, 1004));
+        .status(httpStatus.BAD_REQUEST)
+        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1004));
     }
 
     // Success, then craft jwt token
@@ -180,8 +180,8 @@ const forgotPassword = async (req, res) => {
 
   if (!errors.isEmpty()) {
     return res
-      .status(httpStatus.NOT_FOUND)
-      .json(ERROR_RESPONSE(httpStatus.NOT_FOUND, 1003, { error: errors }));
+      .status(httpStatus.BAD_REQUEST)
+      .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1003, { error: errors }));
   }
 
   const { email } = req.body;
@@ -192,8 +192,8 @@ const forgotPassword = async (req, res) => {
 
     if (!user) {
       return res
-        .status(httpStatus.NOT_FOUND)
-        .json(ERROR_RESPONSE(httpStatus.NOT_FOUND, 1004));
+        .status(httpStatus.BAD_REQUEST)
+        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1004));
     }
 
     // custom secret
@@ -221,8 +221,8 @@ const resetPassword = async (req, res) => {
 
   if (!errors.isEmpty()) {
     return res
-      .status(httpStatus.NOT_FOUND)
-      .json(ERROR_RESPONSE(httpStatus.NOT_FOUND, 1003, { error: errors }));
+      .status(httpStatus.BAD_REQUEST)
+      .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1003, { error: errors }));
   }
 
   try {
@@ -231,8 +231,8 @@ const resetPassword = async (req, res) => {
 
     if (password !== cpassword) {
       return res
-        .status(httpStatus.NOT_FOUND)
-        .json(ERROR_RESPONSE(httpStatus.NOT_FOUND, 1006));
+        .status(httpStatus.BAD_REQUEST)
+        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1006));
     }
 
     const { id, token } = req.params;
@@ -270,8 +270,8 @@ const resetPassword = async (req, res) => {
   } catch (error) {
     console.log("reset password error: ", error);
     res
-      .status(httpStatus.NOT_FOUND)
-      .json(ERROR_RESPONSE(httpStatus.NOT_FOUND, 1007));
+      .status(httpStatus.BAD_REQUEST)
+      .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1007));
   }
 };
 
