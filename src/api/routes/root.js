@@ -27,7 +27,6 @@ router.post(
   authMiddleware,
   upload.single("image"),
   async (req, res) => {
-    console.log("req: ", req);
     const image = req.file;
     const userId = req.user;
     const { title, desc, tags } = req.body;
