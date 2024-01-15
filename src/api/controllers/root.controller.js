@@ -22,35 +22,31 @@ const uploadImage = async (title, file) => {
   const s3Params = {
     Bucket: AWS_BUCKET_NAME,
     Key: key,
-    body: file.buffer,
+    Body: file.buffer,
   };
 
-  let res = await s3.upload(s3Params).promise;
+  let res = await s3.upload(s3Params).promise();
 
   let location = res.Location;
   return location;
 };
 
-const addPost = async (title, desc, tags, location) => {
-  const userId = req.user;
-
+const addPost = async (title, desc, tags, location, userId) => {
   try {
     let newPost = await Post.create({
       userId,
       url: location,
       title,
       desc,
-      tags,
+      tags: JSON.parse(tags),
     });
 
     console.log("new Post: ", newPost);
 
-    res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2007));
+    return true;
   } catch (error) {
     console.log("Error while adding new Post: ", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+    return false;
   }
 };
 

@@ -280,10 +280,17 @@ const resendVerificationMail = async (req, res) => {
   try {
     let checkUser = await User.findOne({ email });
 
+
+    if(checkUser == null){
+      return res
+        .status(httpStatus.BAD_REQUEST)
+        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1004));
+    }
+
     if (checkUser.isVerified == 1) {
       return res
-        .status(httpStatus.OK)
-        .json(SUCCESS_RESPONSE(httpStatus.OK, 1009));
+        .status(httpStatus.BAD_REQUEST)
+        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1009));
     }
 
     // Send mail
