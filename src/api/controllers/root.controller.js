@@ -17,7 +17,7 @@ const s3 = new S3({
 
 // Upload image to s3 and return the location
 const uploadImage = async (title, file) => {
-  let key = `${title}-${Date.now() / 1000}`;
+  let key = `${Date.now()}-${title}-${file.originalname}`;
 
   const s3Params = {
     Bucket: AWS_BUCKET_NAME,
