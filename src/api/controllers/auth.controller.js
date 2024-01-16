@@ -13,6 +13,7 @@ const {
   resetPasswordMail,
 } = require("../../helpers/mails/mailTemplate");
 const jwt = require("jsonwebtoken");
+const UserMeta = require("../models/UserMeta");
 
 const register = async (req, res) => {
   const errors = validationResult(req);
@@ -26,7 +27,15 @@ const register = async (req, res) => {
   }
 
   try {
-    const { email, password } = req.body;
+    const { name, email, password, username } = req.body;
+
+    // check if username exists or not
+    let checkUsername = await UserMeta.find({ username: username });
+    if (checkUsername.length > 0) {
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1010));
+    }
 
     // check if email  exists or not
     let checkUserAccount = await User.find({
@@ -45,8 +54,14 @@ const register = async (req, res) => {
     const secPassword = await bcrypt.hashSync(password, salt);
 
     let createAccount = await User.create({
+      name: name,
       email: email,
       password: secPassword,
+    });
+
+    let updateUserMeta = await UserMeta.create({
+      userId: createAccount._id,
+      username: username,
     });
 
     console.log("created account: ", createAccount);
@@ -161,10 +176,15 @@ const login = async (req, res) => {
     // craft token
     let authToken = jwt.sign(tokenData, process.env.JWT_SECRET);
 
+    // Get username of the user
+    const userMetaData = await UserMeta.findOne({userId: checkAccount._id});
+
+
     res.status(httpStatus.OK).json(
       SUCCESS_RESPONSE(httpStatus.OK, 2004, {
         token: authToken,
         email: checkAccount.email,
+        username: userMetaData.username
       })
     );
   } catch (error) {
@@ -280,8 +300,7 @@ const resendVerificationMail = async (req, res) => {
   try {
     let checkUser = await User.findOne({ email });
 
-
-    if(checkUser == null){
+    if (checkUser == null) {
       return res
         .status(httpStatus.BAD_REQUEST)
         .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1004));

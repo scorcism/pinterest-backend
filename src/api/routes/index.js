@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 const rootRoutes = require("./root");
 const authRoutes = require("./auth");
-
-// api/auth && api/root
+const userMeta = require("./userMeta")
 
 const routes = [
   {
@@ -13,6 +12,10 @@ const routes = [
   {
     path: "/root",
     routes: rootRoutes,
+  },
+  {
+    path: "/user-meta",
+    routes: userMeta,
   },
 ];
 
