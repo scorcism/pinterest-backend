@@ -17,7 +17,6 @@ const health = async (req, res) => {
 const getUserMetaData = async (req, res) => {
   try {
     const userId = req.user;
-    console.log("id: ", userId);
 
     const userMetaData = await UserMeta.findOne({ userId: userId }).select(
       "-userId -updatedAt -__v -_id -username"
@@ -41,18 +40,15 @@ const updateUserMeta = async (req, res) => {
       .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1003, { errors }));
   }
   const userId = req.user;
-  console.log("userid: ", userId);
   const { firstname, lastname, about, website, pronounce, gender } = req.body;
 
   try {
-    const updateUserMeta = await UserMeta.updateOne(
+    await UserMeta.updateOne(
       { userId: userId },
       {
         $set: { firstname, lastname, about, website, pronounce, gender },
       }
     );
-
-    console.log("updateUserMeta: ", updateUserMeta);
     return res
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2012));

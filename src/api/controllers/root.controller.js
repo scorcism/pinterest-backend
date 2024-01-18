@@ -3,11 +3,13 @@ const httpStatus = require("http-status");
 const { ERROR_RESPONSE, SUCCESS_RESPONSE } = require("../../config/constats");
 const Post = require("../models/Post");
 const GlobalTags = require("../models/GlobalTags");
+const UserMeta = require("../models/UserMeta");
 
 const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY;
 const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY;
 const AWS_BUCKET_REGION = process.env.AWS_BUCKET_REGION;
+const ITEMS_PER_PAGE = 20;
 
 const s3 = new S3({
   region: AWS_BUCKET_REGION,
@@ -137,6 +139,54 @@ const updatePost = async (req, res) => {
   }
 };
 
+const getUserDataWithUsername = async (req, res) => {
+  try {
+    const { username } = req.query;
+
+    const userData = await UserMeta.findOne({ username }).select(
+      "firstname lastname about -_id"
+    );
+    res
+      .status(httpStatus.OK)
+      .json(SUCCESS_RESPONSE(httpStatus.OK, 2013, { data: userData }));
+  } catch (error) {
+    console.log("Error while getting user data with username: ", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+  }
+};
+
+const getPosts = async (req, res) => {
+  try {
+    const { page } = req.query;
+
+    const skip = ITEMS_PER_PAGE * (page - 1);
+
+    const documentCountState = Post.estimatedDocumentCount();
+    const postsState = Post.find()
+      .limit(ITEMS_PER_PAGE)
+      .skip(skip)
+      .select("-updatedAt -__v");
+
+    const [posts, documentCount] = await Promise.all([
+      postsState,
+      documentCountState,
+    ]);
+
+    const pageCount = Math.floor(documentCount / ITEMS_PER_PAGE);
+
+    res
+      .status(httpStatus.OK)
+      .json(SUCCESS_RESPONSE(httpStatus.OK, 2014, { posts, pageCount, page }));
+  } catch (error) {
+    console.log("Error while getting posts: ", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+  }
+};
+
 module.exports = {
   addPost,
   deletePost,
@@ -144,4 +194,6 @@ module.exports = {
   uploadImage,
   getGlobalTags,
   createGlobalTags,
+  getUserDataWithUsername,
+  getPosts,
 };

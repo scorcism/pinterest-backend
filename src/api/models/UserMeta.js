@@ -11,6 +11,14 @@ const userMetaSchema = mongoose.Schema(
       unique: true,
       require: true,
     },
+    firstname: {
+      type: String,
+      require: true,
+    },
+    lastname: {
+      type: String,
+      require: true,
+    },
     about: {
       type: String,
       require: true,

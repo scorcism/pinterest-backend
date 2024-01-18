@@ -27,6 +27,7 @@ const SUCCESS_MESSAGE = {
   2011: "Post Deleted",
   2012: "User data updated",
   2013: "User Meta Data",
+  2014: "All Posts",
 };
 
 const ERROR_RESPONSE = (http_code, error_code, error = {}) => {

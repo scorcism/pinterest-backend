@@ -7,6 +7,8 @@ const {
   createGlobalTags,
   deletePost,
   updatePost,
+  getUserDataWithUsername,
+  getPosts,
 } = require("../controllers/root.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 const httpStatus = require("http-status");
@@ -50,5 +52,8 @@ router.post("/deletePost/:id", authMiddleware, deletePost);
 
 router.get("/getGlobalTags", getGlobalTags);
 router.post("/createGlobalTags", createGlobalTags);
+router.get("/userDataByUsername", getUserDataWithUsername)
+router.get("/getPosts", getPosts)
+
 
 module.exports = router;
