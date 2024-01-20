@@ -14,6 +14,12 @@ const {
 } = require("../../helpers/mails/mailTemplate");
 const jwt = require("jsonwebtoken");
 const UserMeta = require("../models/UserMeta");
+const { OAuth2Client } = require("google-auth-library");
+
+const RegisterSource = {
+  GOOGLE: 0,
+  MEMORIES: 1,
+};
 
 const register = async (req, res) => {
   const errors = validationResult(req);
@@ -54,6 +60,7 @@ const register = async (req, res) => {
     const secPassword = await bcrypt.hashSync(password, salt);
 
     let createAccount = await User.create({
+      source: RegisterSource.MEMORIES,
       email: email,
       password: secPassword,
     });
@@ -63,7 +70,6 @@ const register = async (req, res) => {
       username: username,
     });
 
-    console.log("created account: ", createAccount);
     // Send mail
     if (createAccount) {
       let link = `${process.env.FRONTEND_URL}/verify-account/${createAccount._id}`;
@@ -106,7 +112,7 @@ const verifyAccount = async (req, res) => {
     }
 
     // Account exits
-    let verifyUser = await User.updateOne(
+    await User.updateOne(
       { _id: id },
       {
         $set: {
@@ -130,15 +136,27 @@ const verifyAccount = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res
       .status(httpStatus.BAD_REQUEST)
       .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1003, { error: errors }));
   }
+  const { email, password } = req.body;
 
+  try {
+    const response = await loginUtil(email, password, RegisterSource.MEMORIES);
+    console.log("response: ", response);
+    res.status(response.http_code).json({ ...response });
+  } catch (error) {
+    console.log("Logiin error: ", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+  }
+};
+
+const loginUtil = async (email, password, source) => {
   try {
     // Account doesnt exists
     const checkAccount = await User.findOne({
@@ -146,25 +164,32 @@ const login = async (req, res) => {
     });
 
     if (!checkAccount) {
-      return res
-        .status(httpStatus.BAD_REQUEST)
-        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1004));
+      return ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1004);
     }
 
     // Account exists, but not verified
     if (checkAccount.isVerified == 0) {
-      return res
-        .status(httpStatus.BAD_REQUEST)
-        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1005));
+      return ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1005);
+    }
+    if (checkAccount.source != source) {
+      return {
+        http_code: httpStatus.BAD_REQUEST,
+        message: `You have registred with ${
+          Math.abs(1 - source) == 0 ? "GOOGLE" : "MEMORIES"
+        }, Please login with ${
+          Math.abs(1 - source) == 0 ? "GOOGLE" : "MEMORIES"
+        }`,
+        error_code: 9999,
+        data: {},
+        error: {},
+      };
     }
 
     // Password do no
     let passwordCompare = bcrypt.compareSync(password, checkAccount.password);
 
     if (!passwordCompare) {
-      return res
-        .status(httpStatus.BAD_REQUEST)
-        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1004));
+      return ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1004);
     }
 
     // Success, then craft jwt token
@@ -176,16 +201,13 @@ const login = async (req, res) => {
     let authToken = jwt.sign(tokenData, process.env.JWT_SECRET);
 
     // Get username of the user
-    const userMetaData = await UserMeta.findOne({userId: checkAccount._id});
+    const userMetaData = await UserMeta.findOne({ userId: checkAccount._id });
 
-
-    res.status(httpStatus.OK).json(
-      SUCCESS_RESPONSE(httpStatus.OK, 2004, {
-        token: authToken,
-        email: checkAccount.email,
-        username: userMetaData.username
-      })
-    );
+    return SUCCESS_RESPONSE(httpStatus.OK, 2004, {
+      token: authToken,
+      email: checkAccount.email,
+      username: userMetaData.username,
+    });
   } catch (error) {
     console.log("login error: ", error);
     res
@@ -332,6 +354,76 @@ const resendVerificationMail = async (req, res) => {
   }
 };
 
+const google = async (req, res) => {
+  try {
+    const { code } = req.body;
+    console.log("code: ", code);
+
+    const oAuth2Client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      "postmessage"
+    );
+
+    const { tokens } = await oAuth2Client.getToken(code);
+
+    const client = new OAuth2Client();
+
+    const ticket = await client.verifyIdToken({
+      idToken: tokens.id_token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = await ticket.getPayload();
+
+    const { email, sub } = payload;
+
+    let checkUserAccount = await User.findOne({
+      email: email,
+    });
+
+    if (checkUserAccount) {
+      // CHeck the source
+
+      // account is created with memories, will send custom message to loggin with google
+      if (checkUserAccount.source === RegisterSource.MEMORIES) {
+        return res.status(httpStatus.BAD_REQUEST).json(
+          ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1015, {
+            error: ERROR_MESSAGE[1015],
+          })
+        );
+      } else if (checkUserAccount.source === RegisterSource.GOOGLE) {
+        // user is registerd with google, looggin him with google
+        const response = await loginUtil(email, sub, RegisterSource.GOOGLE);
+        return res.status(response.http_code).json({ ...response });
+      }
+    }
+
+    const salt = bcrypt.genSaltSync(10);
+    const secPassword = await bcrypt.hashSync(sub, salt);
+
+    let createAccount = await User.create({
+      source: RegisterSource.GOOGLE,
+      email: email,
+      password: secPassword,
+      isVerified: 1,
+    });
+
+    await UserMeta.create({
+      userId: createAccount._id,
+      username: `${sub}_memories`,
+    });
+
+    const response = await loginUtil(email, sub);
+    res.status(response.http_code).json({ ...response });
+  } catch (error) {
+    console.log("Google auth error: ", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+  }
+};
+
 module.exports = {
   register,
   verifyAccount,
@@ -339,4 +431,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   resendVerificationMail,
+  google,
 };

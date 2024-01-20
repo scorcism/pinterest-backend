@@ -14,6 +14,9 @@ const ERROR_MESSAGE = {
   1011: "Enter valid Post id to bookmark",
   1012: "Post already exists in your acccout",
   1013: "Enter valid username",
+  1014: "You are registers with google, please try to login with google",
+  1015: "Account exists with memories, Login with memories or use forgot password",
+  1016: "Account exists with google, Login with google",
 };
 
 const SUCCESS_MESSAGE = {
