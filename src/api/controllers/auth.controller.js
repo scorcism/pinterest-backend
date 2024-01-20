@@ -27,7 +27,7 @@ const register = async (req, res) => {
   }
 
   try {
-    const { name, email, password, username } = req.body;
+    const { email, password, username } = req.body;
 
     // check if username exists or not
     let checkUsername = await UserMeta.find({ username: username });
@@ -54,12 +54,11 @@ const register = async (req, res) => {
     const secPassword = await bcrypt.hashSync(password, salt);
 
     let createAccount = await User.create({
-      name: name,
       email: email,
       password: secPassword,
     });
 
-    let updateUserMeta = await UserMeta.create({
+    await UserMeta.create({
       userId: createAccount._id,
       username: username,
     });

@@ -3,16 +3,15 @@ const multer = require("multer");
 const {
   uploadImage,
   addPost,
-  getGlobalTags,
-  createGlobalTags,
   deletePost,
   updatePost,
-  getUserDataWithUsername,
   getPosts,
-} = require("../controllers/root.controller");
-const authMiddleware = require("../middleware/auth.middleware");
+  getUserPosts,
+  getPost,
+} = require("../../controllers/posts.controller");
+const authMiddleware = require("../../middleware/auth.middleware");
 const httpStatus = require("http-status");
-const { SUCCESS_RESPONSE, ERROR_RESPONSE } = require("../../config/constats");
+const { SUCCESS_RESPONSE, ERROR_RESPONSE } = require("../../../config/constats");
 
 const router = express.Router();
 
@@ -31,13 +30,13 @@ router.post(
   async (req, res) => {
     const image = req.file;
     const userId = req.user;
-    const { title, desc, tags } = req.body;
+    const { title, desc, postUrl, tags } = req.body;
 
     // Upload image to s3, return the image url
     const location = await uploadImage(title, image);
 
     // Upload image to the DB
-    const response = await addPost(title, desc, tags, location, userId);
+    const response = await addPost(title, desc, postUrl, tags, location, userId);
 
     return response
       ? res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2007))
@@ -49,11 +48,8 @@ router.post(
 
 router.post("/updatePost/:id", authMiddleware, updatePost);
 router.post("/deletePost/:id", authMiddleware, deletePost);
-
-router.get("/getGlobalTags", getGlobalTags);
-router.post("/createGlobalTags", createGlobalTags);
-router.get("/userDataByUsername", getUserDataWithUsername)
-router.get("/getPosts", getPosts)
-
+router.get("/getPosts", getPosts);
+router.get("/getPost/:id", getPost);
+router.get("/getUserPosts", getUserPosts);
 
 module.exports = router;

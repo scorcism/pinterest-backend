@@ -11,6 +11,9 @@ const ERROR_MESSAGE = {
   1008: "Token expired, please login",
   1009: "Account already verified, Please Login",
   1010: "Choose another username",
+  1011: "Enter valid Post id to bookmark",
+  1012: "Post already exists in your acccout",
+  1013: "Enter valid username",
 };
 
 const SUCCESS_MESSAGE = {
@@ -28,6 +31,8 @@ const SUCCESS_MESSAGE = {
   2012: "User data updated",
   2013: "User Meta Data",
   2014: "All Posts",
+  2015: "Bookmark added",
+  2015: "Post Data",
 };
 
 const ERROR_RESPONSE = (http_code, error_code, error = {}) => {

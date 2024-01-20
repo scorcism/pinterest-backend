@@ -6,10 +6,10 @@ const {
   forgotPassword,
   resetPassword,
   resendVerificationMail,
-} = require("../controllers/auth.controller");
+} = require("../../controllers/auth.controller");
 const {
   registerValidation,
-} = require("../../helpers/validations/auth.validation");
+} = require("../../../helpers/validations/auth.validation");
 
 const router = express.Router();
 

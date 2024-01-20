@@ -1,7 +1,6 @@
 const { check } = require("express-validator");
 
 const registerValidation = [
-  check("name", "Enter username").isLength({ min: 1 }),
   check("email", "").isEmail(),
   check("password", "Password should be at least 6 char long").isLength({
     min: 6,
@@ -13,7 +12,7 @@ const registerValidation = [
 
 const loginValidation = [
   check("email", "").isEmail(),
-  check("password", "Password sh  ould be at least 6 char long").isLength({
+  check("password", "Password sh  ould be at least 6 char l ong").isLength({
     min: 6,
   }),
 ];

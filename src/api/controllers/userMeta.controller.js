@@ -59,8 +59,27 @@ const updateUserMeta = async (req, res) => {
   }
 };
 
+const getUserDataWithUsername = async (req, res) => {
+  try {
+    const { username } = req.query;
+
+    const userData = await UserMeta.findOne({ username }).select(
+      "firstname lastname about -_id"
+    );
+    res
+      .status(httpStatus.OK)
+      .json(SUCCESS_RESPONSE(httpStatus.OK, 2013, { data: userData }));
+  } catch (error) {
+    console.log("Error while getting user data with username: ", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+  }
+};
+
 module.exports = {
   health,
   updateUserMeta,
   getUserMetaData,
+  getUserDataWithUsername
 };

@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const rootRoutes = require("./root");
-const authRoutes = require("./auth");
-const userMeta = require("./userMeta")
+const rootRoutes = require("./v1/root");
+const authRoutes = require("./v1/auth");
+const userMeta = require("./v1/userMeta");
+const posts = require("./v1/post");
+const bookmark = require("./v1/bookmark");
 
 const routes = [
   {
@@ -16,6 +18,14 @@ const routes = [
   {
     path: "/user-meta",
     routes: userMeta,
+  },
+  {
+    path: "/posts",
+    routes: posts,
+  },
+  {
+    path: "/bookmark",
+    routes: bookmark,
   },
 ];
 

@@ -18,6 +18,10 @@ const postSchema = mongoose.Schema(
       type: String,
       require: true,
     },
+    postUrl: {
+      type: String,
+      require: true,
+    },
     tags: [
       {
         type: String,
