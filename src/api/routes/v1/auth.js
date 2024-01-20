@@ -6,6 +6,7 @@ const {
   forgotPassword,
   resetPassword,
   resendVerificationMail,
+  google,
 } = require("../../controllers/auth.controller");
 const {
   registerValidation,
@@ -21,6 +22,7 @@ router.post("/register", registerValidation, register);
 router.post("/verify-account/:id", verifyAccount);
 router.post("/resend-verification-mail/", resendVerificationMail);
 router.post("/login", login);
+router.post("/google", google);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:id/:token", resetPassword);
 
