@@ -17,6 +17,8 @@ const ERROR_MESSAGE = {
   1014: "You are registers with google, please try to login with google",
   1015: "Account exists with memories, Login with memories or use forgot password",
   1016: "Account exists with google, Login with google",
+  1017: "Username already taken",
+  1018: "Username Should be of atleast 6 characters",
 };
 
 const SUCCESS_MESSAGE = {
@@ -35,7 +37,9 @@ const SUCCESS_MESSAGE = {
   2013: "User Meta Data",
   2014: "All Posts",
   2015: "Bookmark added",
-  2015: "Post Data",
+  2016: "Post Data",
+  2017: "Ready to take the username",
+  2018: "Username Updated",
 };
 
 const ERROR_RESPONSE = (http_code, error_code, error = {}) => {

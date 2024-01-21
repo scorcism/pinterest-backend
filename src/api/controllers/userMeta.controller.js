@@ -19,7 +19,7 @@ const getUserMetaData = async (req, res) => {
     const userId = req.user;
 
     const userMetaData = await UserMeta.findOne({ userId: userId }).select(
-      "-userId -updatedAt -__v -_id -username"
+      "-userId -updatedAt -__v -_id"
     );
     res
       .status(httpStatus.OK)
@@ -77,9 +77,63 @@ const getUserDataWithUsername = async (req, res) => {
   }
 };
 
+const checkUsername = async (req, res) => {
+  try {
+    const { username } = req.query;
+
+    if (username.length < 6) {
+      return res
+        .status(httpStatus.BAD_REQUEST)
+        .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1018));
+    }
+
+    const checkUser = await UserMeta.findOne({ username });
+
+    if (!checkUser) {
+      return res
+        .status(httpStatus.OK)
+        .json(SUCCESS_RESPONSE(httpStatus.OK, 2017));
+    }
+
+    return res
+      .status(httpStatus.BAD_REQUEST)
+      .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1017));
+  } catch (error) {
+    console.log("Error while checking username: ", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+  }
+};
+
+const updateUsername = async (req, res) => {
+  const userId = req.user;
+
+  const { username } = req.body;
+
+  try {
+    await UserMeta.updateOne(
+      { userId: userId },
+      {
+        $set: { username },
+      }
+    );
+    return res
+      .status(httpStatus.OK)
+      .json(SUCCESS_RESPONSE(httpStatus.OK, 2018));
+  } catch (error) {
+    console.log("Error saving username: ", error);
+    res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+  }
+};
+
 module.exports = {
   health,
   updateUserMeta,
   getUserMetaData,
-  getUserDataWithUsername
+  getUserDataWithUsername,
+  checkUsername,
+  updateUsername,
 };

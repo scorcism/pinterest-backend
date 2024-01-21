@@ -182,7 +182,7 @@ const getPost = async (req, res) => {
 
     res
       .status(httpStatus.OK)
-      .json(SUCCESS_RESPONSE(httpStatus.OK, 2015, { data }));
+      .json(SUCCESS_RESPONSE(httpStatus.OK, 2016, { data }));
   } catch (error) {
     console.log("Get Post error: ", error);
     res
