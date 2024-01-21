@@ -10,11 +10,11 @@ const createGlobalTags = async (req, res) => {
       title: tag,
     });
 
-    console.log("add Global Tag: ", addGlobalTag);
+    // console.log("add Global Tag: ", addGlobalTag);
 
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2009));
   } catch (error) {
-    console.log("Error while getting all tags: ", error);
+    // console.log("Error while getting all tags: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -40,7 +40,7 @@ const getGlobalTags = async (req, res) => {
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2008, { tags: allTags }));
   } catch (error) {
-    console.log("Error while getting all tags: ", error);
+    // console.log("Error while getting all tags: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));

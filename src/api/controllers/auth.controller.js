@@ -11,6 +11,7 @@ const { validationResult } = require("express-validator");
 const {
   verificationMail,
   resetPasswordMail,
+  welcomeMail,
 } = require("../../helpers/mails/mailTemplate");
 const jwt = require("jsonwebtoken");
 const UserMeta = require("../models/UserMeta");
@@ -82,7 +83,7 @@ const register = async (req, res) => {
       })
     );
   } catch (error) {
-    console.log("regsiter error: ", error);
+    // console.log("regsiter error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -121,6 +122,9 @@ const verifyAccount = async (req, res) => {
       }
     );
 
+    // Send Welcome mail
+    welcomeMail(checkUserAccount.email);
+
     // If account verification is done
     res.status(httpStatus.OK).json(
       SUCCESS_RESPONSE(httpStatus.OK, 2002, {
@@ -128,7 +132,7 @@ const verifyAccount = async (req, res) => {
       })
     );
   } catch (error) {
-    console.log("verify account error: ", error);
+    // console.log("verify account error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -146,10 +150,10 @@ const login = async (req, res) => {
 
   try {
     const response = await loginUtil(email, password, RegisterSource.MEMORIES);
-    console.log("response: ", response);
+    // console.log("response: ", response);
     res.status(response.http_code).json({ ...response });
   } catch (error) {
-    console.log("Logiin error: ", error);
+    // console.log("Logiin error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -209,7 +213,7 @@ const loginUtil = async (email, password, source) => {
       username: userMetaData.username,
     });
   } catch (error) {
-    console.log("login error: ", error);
+    // console.log("login error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -250,7 +254,7 @@ const forgotPassword = async (req, res) => {
 
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2005));
   } catch (error) {
-    console.log("forgot password error: ", error);
+    // console.log("forgot password error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -309,7 +313,7 @@ const resetPassword = async (req, res) => {
 
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2006));
   } catch (error) {
-    console.log("reset password error: ", error);
+    // console.log("reset password error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -345,9 +349,9 @@ const resendVerificationMail = async (req, res) => {
       })
     );
 
-    console.log("checkUser: ", checkUser);
+    // console.log("checkUser: ", checkUser);
   } catch (error) {
-    console.log("reset password error: ", error);
+    // console.log("reset password error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -357,7 +361,7 @@ const resendVerificationMail = async (req, res) => {
 const google = async (req, res) => {
   try {
     const { code } = req.body;
-    console.log("code: ", code);
+    // console.log("code: ", code);
 
     const oAuth2Client = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
@@ -414,10 +418,12 @@ const google = async (req, res) => {
       username: `${sub}_memories`,
     });
 
+    welcomeMail(email);
+
     const response = await loginUtil(email, sub);
     res.status(response.http_code).json({ ...response });
   } catch (error) {
-    console.log("Google auth error: ", error);
+    // console.log("Google auth error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));

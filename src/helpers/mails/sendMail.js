@@ -22,13 +22,13 @@ const sendMail = (userEmail, subject, content) => {
 
     transporter.sendMail(mailOption, (error, info) => {
       if (error) {
-        console.log("Mail send eror: ", error);
+        // console.log("Mail send eror: ", error);
       } else {
-        console.log("Mail send eror: ", info.response);
+        // console.log("Mail send eror: ", info.response);
       }
     });
   } catch (error) {
-    console.log("Mail send eror: ", error);
+    // console.log("Mail send eror: ", error);
   }
 };
 
