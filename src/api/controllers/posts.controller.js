@@ -44,11 +44,11 @@ const addPost = async (title, desc, postUrl, tags, location, userId) => {
       tags: JSON.parse(tags),
     });
 
-    console.log("new Post: ", newPost);
+    // console.log("new Post: ", newPost);
 
     return true;
   } catch (error) {
-    console.log("Error while adding new Post: ", error);
+    // console.log("Error while adding new Post: ", error);
     return false;
   }
 };
@@ -58,13 +58,13 @@ const deletePost = async (req, res) => {
   const postId = req.params.id;
   try {
     const deletePost = await Post.deleteOne({ userId: userId, _id: postId });
-    console.log("delete Post: ", deletePost);
+    // console.log("delete Post: ", deletePost);
 
     return res
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2011));
   } catch (error) {
-    console.log("Error while deleting Post: ", error);
+    // console.log("Error while deleting Post: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -84,11 +84,11 @@ const updatePost = async (req, res) => {
       { $set: { title, desc } }
     );
 
-    console.log("update Post: ", updatePost);
+    // console.log("update Post: ", updatePost);
 
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2010));
   } catch (error) {
-    console.log("Error while updating post: ", error);
+    // console.log("Error while updating post: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -118,7 +118,7 @@ const getPosts = async (req, res) => {
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2014, { posts, pageCount, page }));
   } catch (error) {
-    console.log("Error while getting posts: ", error);
+    // console.log("Error while getting posts: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -147,7 +147,7 @@ const getUserPosts = async (req, res) => {
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2015, { posts }));
   } catch (error) {
-    console.log("Get bookmarks error: ", error);
+    // console.log("Get bookmarks error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -184,7 +184,7 @@ const getPost = async (req, res) => {
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2016, { data }));
   } catch (error) {
-    console.log("Get Post error: ", error);
+    // console.log("Get Post error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));

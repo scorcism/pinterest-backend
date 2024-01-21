@@ -34,7 +34,7 @@ const addBookmark = async (req, res) => {
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2015));
   } catch (error) {
-    console.log("add Bookmark error: ", error);
+    // console.log("add Bookmark error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -63,7 +63,7 @@ const getBookmarks = async (req, res) => {
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2015, { bookmarks }));
   } catch (error) {
-    console.log("Get bookmarks error: ", error);
+    // console.log("Get bookmarks error: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));

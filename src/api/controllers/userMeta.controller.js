@@ -7,7 +7,7 @@ const health = async (req, res) => {
   try {
     res.send("User meta API health working");
   } catch (error) {
-    console.log("Error while adding new Post: ", error);
+    // console.log("Error while adding new Post: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -25,7 +25,7 @@ const getUserMetaData = async (req, res) => {
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2013, { data: userMetaData }));
   } catch (error) {
-    console.log("Error while get user meta data: ", error);
+    // console.log("Error while get user meta data: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -70,7 +70,7 @@ const getUserDataWithUsername = async (req, res) => {
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2013, { data: userData }));
   } catch (error) {
-    console.log("Error while getting user data with username: ", error);
+    // console.log("Error while getting user data with username: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -99,7 +99,7 @@ const checkUsername = async (req, res) => {
       .status(httpStatus.BAD_REQUEST)
       .json(ERROR_RESPONSE(httpStatus.BAD_REQUEST, 1017));
   } catch (error) {
-    console.log("Error while checking username: ", error);
+    // console.log("Error while checking username: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -122,7 +122,7 @@ const updateUsername = async (req, res) => {
       .status(httpStatus.OK)
       .json(SUCCESS_RESPONSE(httpStatus.OK, 2018));
   } catch (error) {
-    console.log("Error saving username: ", error);
+    // console.log("Error saving username: ", error);
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
