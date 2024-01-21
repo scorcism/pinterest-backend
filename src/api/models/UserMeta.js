@@ -23,7 +23,7 @@ const userMetaSchema = mongoose.Schema(
       type: String,
       require: true,
     },
-    webite: {
+    website: {
       type: String,
       require: true,
     },
