@@ -44,11 +44,11 @@ const register = async (req, res) => {
     }
 
     // check if email  exists or not
-    let checkUserAccount = await User.find({
+    let checkUserAccount = await User.findOne({
       email: email,
     });
 
-    if (checkUserAccount.length > 0) {
+    if (checkUserAccount) {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).json(
         ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1002, {
           error: ERROR_MESSAGE[1002],
