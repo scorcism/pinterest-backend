@@ -7,7 +7,6 @@ const authMiddleware = (req, res, next) => {
     const tokenHeader = req.headers.authorization;
 
     if (!tokenHeader) {
-      console.log("Middleware error: ");
       return res
         .status(httpStatus.INTERNAL_SERVER_ERROR)
         .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1008));

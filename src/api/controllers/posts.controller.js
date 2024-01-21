@@ -9,7 +9,7 @@ const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY;
 const AWS_SECRET_KEY = process.env.AWS_SECRET_KEY;
 const AWS_BUCKET_REGION = process.env.AWS_BUCKET_REGION;
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 10;
 
 const s3 = new S3({
   region: AWS_BUCKET_REGION,
@@ -112,11 +112,16 @@ const getPosts = async (req, res) => {
       documentCountState,
     ]);
 
-    const pageCount = Math.floor(documentCount / ITEMS_PER_PAGE);
+    const pageCount = Math.ceil(documentCount / ITEMS_PER_PAGE);
 
-    res
-      .status(httpStatus.OK)
-      .json(SUCCESS_RESPONSE(httpStatus.OK, 2014, { posts, pageCount, page }));
+    res.status(httpStatus.OK).json(
+      SUCCESS_RESPONSE(httpStatus.OK, 2014, {
+        posts,
+        pageCount,
+        page,
+        totalPosts: documentCount,
+      })
+    );
   } catch (error) {
     console.log("Error while getting posts: ", error);
     res
