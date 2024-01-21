@@ -6,6 +6,13 @@ const authMiddleware = (req, res, next) => {
   try {
     const tokenHeader = req.headers.authorization;
 
+    if (!tokenHeader) {
+      console.log("Middleware error: ");
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1008));
+    }
+
     const token = tokenHeader.split(" ")[1];
     const data = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -14,10 +21,9 @@ const authMiddleware = (req, res, next) => {
     next();
   } catch (error) {
     console.log("Middleware error: ", error);
-    return res.status(
-      httpStatus.INTERNAL_SERVER_ERROR,
-      ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1008)
-    );
+    return res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1008));
   }
 };
 

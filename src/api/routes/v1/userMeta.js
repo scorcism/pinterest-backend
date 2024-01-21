@@ -3,6 +3,8 @@ const {
   health,
   updateUserMeta,
   getUserMetaData,
+  checkUsername,
+  updateUsername,
 } = require("../../controllers/userMeta.controller");
 const {
   updateUserMetaValidation,
@@ -22,4 +24,7 @@ router.post(
 router.get("/userDataByUsername", getUserDataWithUsername);
 
 router.get("/user-meta-data", authMiddleware, getUserMetaData);
+router.get("/checkUsername", authMiddleware, checkUsername);
+router.post("/updateUsername", authMiddleware, updateUsername);
+
 module.exports = router;
