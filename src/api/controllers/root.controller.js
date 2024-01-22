@@ -6,7 +6,7 @@ const createGlobalTags = async (req, res) => {
   const { tag } = req.body;
 
   try {
-    let addGlobalTag = await GlobalTags.create({
+    await GlobalTags.create({
       title: tag,
     });
 

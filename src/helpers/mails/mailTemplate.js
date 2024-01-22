@@ -1,4 +1,3 @@
-const { each } = require("lodash");
 const sendMail = require("./sendMail");
 
 const verificationMail = async (email, link) => {

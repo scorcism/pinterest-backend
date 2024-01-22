@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const logger = require("../../config/logger");
 const { SMTP_USER, SMTP_PASSWORD } = process.env;
 
 const sendMail = (userEmail, subject, content) => {
@@ -22,9 +23,10 @@ const sendMail = (userEmail, subject, content) => {
 
     transporter.sendMail(mailOption, (error, info) => {
       if (error) {
-        // console.log("Mail send eror: ", error);
+        logger.error(`Mail send error to: ${userEmail}`)
+        console.log("Mail send eror: ", error);
       } else {
-        // console.log("Mail send eror: ", info.response);
+        logger.info(`Mail sent to ${userEmail}:${info.response}`);
       }
     });
   } catch (error) {

@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
 const { ERROR_RESPONSE, SUCCESS_RESPONSE } = require("../../config/constats");
-const { validationResult, check } = require("express-validator");
+const { validationResult } = require("express-validator");
 const Bookmark = require("../models/Bookmar");
 const UserMeta = require("../models/UserMeta");
 
