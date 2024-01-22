@@ -16,6 +16,7 @@ const {
 const jwt = require("jsonwebtoken");
 const UserMeta = require("../models/UserMeta");
 const { OAuth2Client } = require("google-auth-library");
+const logger = require("../../config/logger");
 
 const RegisterSource = {
   GOOGLE: 0,
@@ -149,11 +150,15 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    logger.info(`Login request ${email} :: IP :: ${req.clientIp}`);
     const response = await loginUtil(email, password, RegisterSource.MEMORIES);
-    // console.log("response: ", response);
+
     res.status(response.http_code).json({ ...response });
   } catch (error) {
-    // console.log("Logiin error: ", error);
+    logger.log({
+      level: "error",
+      message: `Login error ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -214,6 +219,10 @@ const loginUtil = async (email, password, source) => {
     });
   } catch (error) {
     // console.log("login error: ", error);
+    logger.log({
+      level: "error",
+      message: `Login error ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -255,6 +264,11 @@ const forgotPassword = async (req, res) => {
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2005));
   } catch (error) {
     // console.log("forgot password error: ", error);
+
+    logger.log({
+      level: "error",
+      message: `Forgot Password error ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -314,6 +328,11 @@ const resetPassword = async (req, res) => {
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2006));
   } catch (error) {
     // console.log("reset password error: ", error);
+
+    logger.log({
+      level: "error",
+      message: `Reset Password error ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -348,10 +367,13 @@ const resendVerificationMail = async (req, res) => {
         data: SUCCESS_MESSAGE[2001],
       })
     );
-
-    // console.log("checkUser: ", checkUser);
   } catch (error) {
     // console.log("reset password error: ", error);
+
+    logger.log({
+      level: "error",
+      message: `Resend Verification error ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -424,6 +446,10 @@ const google = async (req, res) => {
     res.status(response.http_code).json({ ...response });
   } catch (error) {
     // console.log("Google auth error: ", error);
+    logger.log({
+      level: "error",
+      message: `Google auth ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
