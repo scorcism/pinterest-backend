@@ -130,3 +130,6 @@ dist
 .pnp.*
 
 *audit.json
+
+memories_logs
+/memories_logs
