@@ -223,9 +223,7 @@ const loginUtil = async (email, password, source) => {
       level: "error",
       message: `Login error ${JSON.stringify(error)}`,
     });
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+    return (ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
   }
 };
 
@@ -357,8 +355,8 @@ const resendVerificationMail = async (req, res) => {
     }
 
     // Send mail
-    if (createAccount) {
-      let link = `${process.env.FRONTEND_URL}/verify-account/${createAccount._id}`;
+    if (checkUser) {
+      let link = `${process.env.FRONTEND_URL}/verify-account/${checkUser._id}`;
       await verificationMail(email, link);
     }
 
