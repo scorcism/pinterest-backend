@@ -6,6 +6,8 @@ const dotenv = require("dotenv");
 const connectMongoose = require("./config/dbConn");
 const logger = require("./config/logger");
 const requestIp = require("request-ip");
+const { rateLimit } = require("express-rate-limit");
+
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
@@ -23,6 +25,14 @@ const initapp = async () => {
   app.get("/", (req, res) => {
     res.send("Hello World, Im backend!");
   });
+
+  const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000,
+    limit: 10,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+  });
+  app.use(limiter);
 
   connectMongoose();
 
