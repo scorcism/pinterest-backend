@@ -12,7 +12,7 @@ const {
   verificationMail,
   resetPasswordMail,
   welcomeMail,
-} = require("../../helpers/mails/mailTemplate");
+} = require("../../helpers/mails/mailHandler");
 const jwt = require("jsonwebtoken");
 const UserMeta = require("../models/UserMeta");
 const { OAuth2Client } = require("google-auth-library");

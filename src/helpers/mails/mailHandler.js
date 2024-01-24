@@ -1,4 +1,8 @@
 const sendMail = require("./sendMail");
+const {
+  welcomeMailListQueue,
+  emailVerificationMailQueue,
+} = require("../../config/Queues/queues");
 
 const verificationMail = async (email, link) => {
   let subject = `Account Verification - Memories`;
@@ -54,8 +58,15 @@ const verificationMail = async (email, link) => {
     </html>
   `;
 
-  await sendMail(email, subject, content);
+  await emailVerificationMailQueue.add(`${Date.now()}`, {
+    data: {
+      subject: subject,
+      content: content,
+      email: email,
+    },
+  });
 };
+
 const resetPasswordMail = async (email, link) => {
   let subject = "Reset Password - Memories";
 
@@ -152,11 +163,16 @@ const welcomeMail = async (email) => {
     </html>
   `;
 
-  await sendMail(email, subject, content);
+  await welcomeMailListQueue.add(`${Date.now()}`),
+    {
+      subject,
+      content,
+      email,
+    };
 };
 
 module.exports = {
   verificationMail,
   resetPasswordMail,
-  welcomeMail
+  welcomeMail,
 };
