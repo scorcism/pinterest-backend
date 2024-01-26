@@ -1,5 +1,5 @@
 const winston = require("winston");
-const DailyRotateFIle = require("winston-daily-rotate-file");
+const DailyRotateFile = require("winston-daily-rotate-file");
 
 /**
  * Log Levels
@@ -39,7 +39,7 @@ let winstonFormat = winston.format.combine(
   })
 );
 
-const fileTransportRotation = new DailyRotateFIle({
+const fileTransportRotation = new DailyRotateFile({
   filename: "./memories_logs/%DATE%",
   datePattern: "DD-MMM-YYYY",
   zippedArchive: true,
@@ -52,7 +52,7 @@ const fileTransportRotation = new DailyRotateFIle({
 winstonTransports.push(fileTransportRotation);
 
 const logger = winston.createLogger({
-  level: String(process.env.LOG_LEVEL) | "error",
+  level: String(process.env.LOG_LEVEL) || "error",
   format: winstonFormat,
   transports: winstonTransports,
 });
