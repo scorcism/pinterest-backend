@@ -32,7 +32,8 @@ const initapp = async () => {
     standardHeaders: "draft-7",
     legacyHeaders: false,
   });
-  app.use(limiter);
+  // TODO: 
+  // app.use(limiter);
 
   connectMongoose();
 

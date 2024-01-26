@@ -8,15 +8,15 @@ const {
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
-const {
-  verificationMail,
-  resetPasswordMail,
-  welcomeMail,
-} = require("../../helpers/mails/mailTemplate");
 const jwt = require("jsonwebtoken");
 const UserMeta = require("../models/UserMeta");
 const { OAuth2Client } = require("google-auth-library");
 const logger = require("../../config/logger");
+const {
+  resetPasswordMailQueue,
+  welcomeMailListQueue,
+  emailVerificationMailQueue,
+} = require("../../config/queues");
 
 const RegisterSource = {
   GOOGLE: 0,
@@ -73,10 +73,14 @@ const register = async (req, res) => {
     });
 
     // Send mail
-    if (createAccount) {
-      let link = `${process.env.FRONTEND_URL}/verify-account/${createAccount._id}`;
-      await verificationMail(email, link);
-    }
+
+    let link = `${process.env.FRONTEND_URL}/verify-account/${createAccount._id}`;
+    await emailVerificationMailQueue.add(`emailVerification - ${email}`, {
+      data: {
+        email,
+        link,
+      },
+    });
 
     res.status(httpStatus.CREATED).json(
       SUCCESS_RESPONSE(httpStatus.CREATED, 2001, {
@@ -124,7 +128,11 @@ const verifyAccount = async (req, res) => {
     );
 
     // Send Welcome mail
-    welcomeMail(checkUserAccount.email);
+    await welcomeMailListQueue.add(`welcomeMail-${checkUserAccount.email}`, {
+      data: {
+        email: checkUserAccount.email,
+      },
+    });
 
     // If account verification is done
     res.status(httpStatus.OK).json(
@@ -223,7 +231,7 @@ const loginUtil = async (email, password, source) => {
       level: "error",
       message: `Login error ${JSON.stringify(error)}`,
     });
-    return (ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+    return ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001);
   }
 };
 
@@ -257,11 +265,18 @@ const forgotPassword = async (req, res) => {
 
     const link = `${process.env.FRONTEND_URL}/reset-password/${user._id}/${token}`;
 
-    await resetPasswordMail(email, link);
+    // await resetPasswordMail(email, link);
+
+    await resetPasswordMailQueue.add(`ResetPassword-${email}`, {
+      data: {
+        email,
+        link,
+      },
+    });
 
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2005));
   } catch (error) {
-    // console.log("forgot password error: ", error);
+    console.log("forgot password error: ", error);
 
     logger.log({
       level: "error",
@@ -357,7 +372,12 @@ const resendVerificationMail = async (req, res) => {
     // Send mail
     if (checkUser) {
       let link = `${process.env.FRONTEND_URL}/verify-account/${checkUser._id}`;
-      await verificationMail(email, link);
+      await emailVerificationMailQueue.add(`resendVerificatioMail-${email}`, {
+        data: {
+          email,
+          link,
+        },
+      });
     }
 
     res.status(httpStatus.CREATED).json(
@@ -408,7 +428,6 @@ const google = async (req, res) => {
 
     if (checkUserAccount) {
       // CHeck the source
-
       // account is created with memories, will send custom message to loggin with google
       if (checkUserAccount.source === RegisterSource.MEMORIES) {
         return res.status(httpStatus.BAD_REQUEST).json(
@@ -438,7 +457,12 @@ const google = async (req, res) => {
       username: `${sub}_memories`,
     });
 
-    welcomeMail(email);
+    // Send Welcome mail
+    await welcomeMailListQueue.add(`welcomeMail-${email}`, {
+      data: {
+        email,
+      },
+    });
 
     const response = await loginUtil(email, sub);
     res.status(response.http_code).json({ ...response });
