@@ -16,14 +16,18 @@ const initapp = async () => {
   const app = express();
 
   // Middlewares
-  app.use(bodyParser.urlencoded({ extended: false }));
   app.use(cors());
+  app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
-  app.use(helmet());
+  app.use(
+    helmet({
+      referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    })
+  );
   app.use(requestIp.mw());
 
   app.get("/", (req, res) => {
-    res.send("Hello World, Im backend!");
+    res.send("Hello World, Im! backend");
   });
 
   const limiter = rateLimit({
@@ -32,12 +36,31 @@ const initapp = async () => {
     standardHeaders: "draft-7",
     legacyHeaders: false,
   });
-  // TODO: 
-  // app.use(limiter);
+
+  app.use(limiter);
+
+  if (!process.env.DB_CONNECTION_STRING) {
+    console.error("DB_CONNECTION_STRING is not set. Exiting...");
+    process.exit(1);
+  }
 
   connectMongoose();
 
   app.use("/api", require("./api/routes/index"));
+
+  app.use((err, req, res, next) => {
+    let httpCode = err.httpCode || 500;
+    let errorCode = err.errorCode || "INTERNAL_SERVER_ERROR";
+    let errorMessage = err.message || "Internal Server Error";
+
+    res.status(httpCode).json({
+      http_code: httpCode,
+      message: errorMessage,
+      error_code: errorCode,
+      data: {},
+      error: err,
+    });
+  });
 
   app.listen(PORT, () => {
     logger.log({

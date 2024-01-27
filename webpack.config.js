@@ -1,13 +1,27 @@
 const path = require('path');
 
 module.exports = {
-  mode: 'production',
   entry: './src/index.js',
   output: {
-    path: path.join(__dirname, 'dist'),
-    publicPath: '/',
-    filename: 'index.js',
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
   },
-  externals:[nodeExternals()],
   target: 'node',
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+          },
+        },
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.js'],
+  },
 };
