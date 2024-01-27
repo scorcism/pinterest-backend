@@ -31,7 +31,7 @@ services:
     ports:
       - "$PORT:$PORT"
     restart: unless-stopped
-    command: npm run start
+    command: npm run prod
     stdin_open: true
     tty: true
     volumes:
