@@ -7,8 +7,7 @@
     "start": "nodemon ./src/index.js",
     "eslint": "eslint ./",
     "eslint-fix": "eslint ./ --fix",
-    "build": "webpack",
-    "prestart": "npm run build"
+    "build": "webpack"
   },
   "keywords": [],
   "author": "",
