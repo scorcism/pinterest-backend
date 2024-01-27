@@ -8,14 +8,15 @@ const {
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
-const {
-  verificationMail,
-  resetPasswordMail,
-  welcomeMail,
-} = require("../../helpers/mails/mailTemplate");
 const jwt = require("jsonwebtoken");
 const UserMeta = require("../models/UserMeta");
 const { OAuth2Client } = require("google-auth-library");
+const logger = require("../../config/logger");
+const {
+  resetPasswordMailQueue,
+  welcomeMailListQueue,
+  emailVerificationMailQueue,
+} = require("../../config/queues");
 
 const RegisterSource = {
   GOOGLE: 0,
@@ -72,10 +73,14 @@ const register = async (req, res) => {
     });
 
     // Send mail
-    if (createAccount) {
-      let link = `${process.env.FRONTEND_URL}/verify-account/${createAccount._id}`;
-      await verificationMail(email, link);
-    }
+
+    let link = `${process.env.FRONTEND_URL}/verify-account/${createAccount._id}`;
+    await emailVerificationMailQueue.add(`emailVerification - ${email}`, {
+      data: {
+        email,
+        link,
+      },
+    });
 
     res.status(httpStatus.CREATED).json(
       SUCCESS_RESPONSE(httpStatus.CREATED, 2001, {
@@ -123,7 +128,11 @@ const verifyAccount = async (req, res) => {
     );
 
     // Send Welcome mail
-    welcomeMail(checkUserAccount.email);
+    await welcomeMailListQueue.add(`welcomeMail-${checkUserAccount.email}`, {
+      data: {
+        email: checkUserAccount.email,
+      },
+    });
 
     // If account verification is done
     res.status(httpStatus.OK).json(
@@ -149,11 +158,15 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    logger.info(`Login request ${email} :: IP :: ${req.clientIp}`);
     const response = await loginUtil(email, password, RegisterSource.MEMORIES);
-    // console.log("response: ", response);
+
     res.status(response.http_code).json({ ...response });
   } catch (error) {
-    // console.log("Logiin error: ", error);
+    logger.log({
+      level: "error",
+      message: `Login error ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -214,9 +227,11 @@ const loginUtil = async (email, password, source) => {
     });
   } catch (error) {
     // console.log("login error: ", error);
-    res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
+    logger.log({
+      level: "error",
+      message: `Login error ${JSON.stringify(error)}`,
+    });
+    return ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001);
   }
 };
 
@@ -250,11 +265,23 @@ const forgotPassword = async (req, res) => {
 
     const link = `${process.env.FRONTEND_URL}/reset-password/${user._id}/${token}`;
 
-    await resetPasswordMail(email, link);
+    // await resetPasswordMail(email, link);
+
+    await resetPasswordMailQueue.add(`ResetPassword-${email}`, {
+      data: {
+        email,
+        link,
+      },
+    });
 
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2005));
   } catch (error) {
-    // console.log("forgot password error: ", error);
+    console.log("forgot password error: ", error);
+
+    logger.log({
+      level: "error",
+      message: `Forgot Password error ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -314,6 +341,11 @@ const resetPassword = async (req, res) => {
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2006));
   } catch (error) {
     // console.log("reset password error: ", error);
+
+    logger.log({
+      level: "error",
+      message: `Reset Password error ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -338,9 +370,14 @@ const resendVerificationMail = async (req, res) => {
     }
 
     // Send mail
-    if (createAccount) {
-      let link = `${process.env.FRONTEND_URL}/verify-account/${createAccount._id}`;
-      await verificationMail(email, link);
+    if (checkUser) {
+      let link = `${process.env.FRONTEND_URL}/verify-account/${checkUser._id}`;
+      await emailVerificationMailQueue.add(`resendVerificatioMail-${email}`, {
+        data: {
+          email,
+          link,
+        },
+      });
     }
 
     res.status(httpStatus.CREATED).json(
@@ -348,10 +385,13 @@ const resendVerificationMail = async (req, res) => {
         data: SUCCESS_MESSAGE[2001],
       })
     );
-
-    // console.log("checkUser: ", checkUser);
   } catch (error) {
     // console.log("reset password error: ", error);
+
+    logger.log({
+      level: "error",
+      message: `Resend Verification error ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
@@ -388,7 +428,6 @@ const google = async (req, res) => {
 
     if (checkUserAccount) {
       // CHeck the source
-
       // account is created with memories, will send custom message to loggin with google
       if (checkUserAccount.source === RegisterSource.MEMORIES) {
         return res.status(httpStatus.BAD_REQUEST).json(
@@ -418,12 +457,21 @@ const google = async (req, res) => {
       username: `${sub}_memories`,
     });
 
-    welcomeMail(email);
+    // Send Welcome mail
+    await welcomeMailListQueue.add(`welcomeMail-${email}`, {
+      data: {
+        email,
+      },
+    });
 
     const response = await loginUtil(email, sub);
     res.status(response.http_code).json({ ...response });
   } catch (error) {
     // console.log("Google auth error: ", error);
+    logger.log({
+      level: "error",
+      message: `Google auth ${JSON.stringify(error)}`,
+    });
     res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));

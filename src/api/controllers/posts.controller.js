@@ -3,7 +3,6 @@ const httpStatus = require("http-status");
 const { ERROR_RESPONSE, SUCCESS_RESPONSE } = require("../../config/constats");
 const Post = require("../models/Post");
 const UserMeta = require("../models/UserMeta");
-const User = require("../models/User");
 
 const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
 const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY;
@@ -35,7 +34,7 @@ const uploadImage = async (title, file) => {
 
 const addPost = async (title, desc, postUrl, tags, location, userId) => {
   try {
-    let newPost = await Post.create({
+    await Post.create({
       userId,
       url: location,
       title,
@@ -57,8 +56,7 @@ const deletePost = async (req, res) => {
   const userId = req.user;
   const postId = req.params.id;
   try {
-    const deletePost = await Post.deleteOne({ userId: userId, _id: postId });
-    // console.log("delete Post: ", deletePost);
+    await Post.deleteOne({ userId: userId, _id: postId });
 
     return res
       .status(httpStatus.OK)
@@ -79,12 +77,10 @@ const updatePost = async (req, res) => {
   const { title, desc } = req.body;
 
   try {
-    const updatePost = await Post.updateOne(
+    await Post.updateOne(
       { userId: userId, _id: postId },
       { $set: { title, desc } }
     );
-
-    // console.log("update Post: ", updatePost);
 
     res.status(httpStatus.OK).json(SUCCESS_RESPONSE(httpStatus.OK, 2010));
   } catch (error) {
@@ -161,6 +157,9 @@ const getPost = async (req, res) => {
       "_id url title desc postUrl tags createdAt userId"
     );
     if (!postData) {
+      res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json(ERROR_RESPONSE(httpStatus.INTERNAL_SERVER_ERROR, 1001));
     }
 
     const userData = await UserMeta.findOne({ userId: postData.userId }).select(

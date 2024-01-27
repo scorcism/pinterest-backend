@@ -3,9 +3,6 @@ const {
   getGlobalTags,
   createGlobalTags,
 } = require("../../controllers/root.controller");
-const authMiddleware = require("../../middleware/auth.middleware");
-const httpStatus = require("http-status");
-const { SUCCESS_RESPONSE, ERROR_RESPONSE } = require("../../../config/constats");
 
 const router = express.Router();
 
