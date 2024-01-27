@@ -8,5 +8,6 @@ module.exports = {
     publicPath: '/',
     filename: 'index.js',
   },
+  externals:[nodeExternals()],
   target: 'node',
 };
