@@ -1,5 +1,4 @@
 const express = require("express");
-const helmet = require("helmet");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
@@ -19,11 +18,6 @@ const initapp = async () => {
   app.use(cors());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
-  app.use(
-    helmet({
-      referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-    })
-  );
   app.use(requestIp.mw());
 
   app.get("/", (req, res) => {
